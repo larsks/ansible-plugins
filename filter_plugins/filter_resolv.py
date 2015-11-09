@@ -1,4 +1,4 @@
-# (c) 2014, Maciej Delmanowski <drybjed@gmail.com>
+# (c) 2015 Ansible Project Contributors
 #
 # This file is part of Ansible
 #
@@ -25,6 +25,8 @@ from ansible import errors
 
 
 def _resolv(v):
+    '''resolv a hostname, properly transforming exceptions from the
+    socket module into AnsibleFilterError exceptions.'''
     try:
         r = socket.gethostbyname_ex(v)
     except socket.gaierror as exc:
@@ -35,18 +37,20 @@ def _resolv(v):
 
 
 def filter_resolv(v):
+    '''Return the first available address for the given hostname.'''
     r = _resolv(v)
     return r[2][0]
 
 
 def filter_resolv_all(v):
+    '''Return all available addresses for the given hostname.'''
     r = _resolv(v)
     return r[2]
 
 
 class FilterModule(object):
-    ''' Hostname lookup filter '''
-    filter_map =  {
+    '''Provides resolv and resolv_all filters.'''
+    filter_map = {
         'resolv': filter_resolv,
         'resolv_all': filter_resolv_all,
     }
